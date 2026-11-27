@@ -61,6 +61,16 @@ cargo build --release
 .\gp-pc-boost.exe tune preview
 ```
 
+## Credits & Upstream Projects
+
+This project would not exist without the work of these open-source authors:
+
+- **[WinRust](https://github.com/Lemxy/WinRust)** by **Lemxy** (MIT / Apache-2.0) — foundational `winrust-common` crate and native Windows component replacement architecture.
+- **[rust-anything](https://github.com/erkamyaman/rust-anything)** by **Erkam Yaman (`erkamyaman`)** (MIT) — fast local NTFS file indexing & search inspiration.
+- **[Coucou](https://github.com/Louis-CFM/coucou)** by **Louis Raillé (`Louis-CFM`)** (MIT source; brand/character assets reserved) — optional assistant island integration and spring motion inspiration.
+- **[Goose](https://github.com/aardappel/goose)** by **Wouter van Oortmerssen (`aardappel`)** (Apache-2.0) — benchmark script language (`bench/speed_bench.goose`).
+- **[windows-rs / windows-sys](https://github.com/microsoft/windows-rs)** by **Microsoft** (MIT / Apache-2.0) — Rust Win32 & DWM bindings.
+
 ## License
 
-Licensed under the [MIT License](LICENSE).
+Licensed under the [MIT License](LICENSE). Full upstream license texts and copyright notices are preserved in [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
