@@ -1,0 +1,13 @@
+/target
+/state
+/REPORT.md
+bench/*.exe
+*.c
+*.pdb
+*.log
+.env
+.env.*
+*.key
+*.pem
+*.pfx
+
