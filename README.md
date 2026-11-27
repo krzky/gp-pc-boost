@@ -1,60 +1,66 @@
 # gp-pc-boost
 
-Native Windows PC performance audit, WinRust component replacer, bloatware inspector, and benchmark suite built on **WinRust** (`winrust-common` + `payload/`), **Goose v2026.4** (`bench/speed_bench.goose`), and **rust-anything**.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## Design & Safety Boundaries
+Native **Windows 12 Fluent 2 multi-monitor taskbar (`gp-taskbar`)** and Windows PC performance/audit toolkit written in Rust & Win32/DWM — zero Electron/WebView runtime overhead, single standalone native executable.
 
-- **Never runs `plugin-launcher.exe`**: Avoids the `WinRust-update` SYSTEM scheduled task while still using the locally audited WinRust binaries directly.
-- **Sophos-safe**: Never modifies Windows Defender exclusions.
-- **Pre-change safety backups**: Every `replace apply` and `bloat purge` automatically snapshots `net use`, `HKCU\Network`, Edge `Default` profile files, Quick Access jump lists, and the installed Appx list into `%LOCALAPPDATA%\gp-pc-boost\backups\<timestamp>`.
-- **Full rollback**: Every WinRust component replacement is recorded in `%LOCALAPPDATA%\gp-pc-boost\replace_journal.log` and cleanly restored in reverse order via `gp-pc-boost replace revert all` or `scripts\rollback-all.ps1`.
+## Features (`gp-taskbar`)
 
-## Build
+- **Three Fluent 2 Layouts**: `Win12 Split` (floating app dock + floating status/clock/tray modules), `Unified Top`, and `Unified Bottom`.
+- **Hardware-VSync Spring Animations**: 60–240 Hz `DwmFlush()`-paced critically-damped springs for bar reveals, auto-hide glides, flyouts, and search morphing (0% idle CPU).
+- **Native Windows Fullscreen Gaming Mode**: Automatically suppresses all taskbar bars, popups, tooltips, and edge sensors per-monitor during exclusive or borderless fullscreen games (while ignoring normal maximized desktop windows). Pressing the **Windows key** immediately reveals the taskbar over anything.
+- **Built-in Native Search**: Instant app/settings/calculator/web search bar with smooth pill morph and zero focus-steal issues.
+- **Multi-Monitor & Live DWM Previews**: Per-monitor filtering, live thumbnail hover previews, drag-to-reorder pinned apps, system tray overflow flyout, CPU/RAM/battery telemetry, and system accent/dark/light/glass theming.
+- **100% Reversible**: Right-click → **Restore Stock Taskbar** or run `Uninstall-Taskbar.bat` to restore the default Windows taskbar cleanly at any time.
+
+## Install (Windows 10 / 11 x64)
+
+### Option 1 — Quick Install from Releases (Recommended)
+1. Download **`gp-pc-boost-v0.1.0-windows-x64.zip`** from the [Releases](https://github.com/krzky/gp-pc-boost/releases) page.
+2. Extract the zip anywhere and double-click **`Install-Taskbar.bat`**.
+   - Installs `gp-taskbar.exe` (plus `gp-pc-boost-ui.exe` and `gp-pc-boost.exe`) into `%LOCALAPPDATA%\gp-pc-boost\bin`.
+   - Registers automatic startup on login (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run\gp-taskbar`) — no administrator rights required.
+   - Launches `gp-taskbar.exe` immediately.
+
+### Option 2 — Portable Zero-Install
+- Download **`gp-taskbar-v0.1.0-windows-x64.exe`** from [Releases](https://github.com/krzky/gp-pc-boost/releases) and double-click it directly.
+
+### Uninstall / Restore Stock Windows Taskbar
+- Double-click **`Uninstall-Taskbar.bat`** (or run `gp-taskbar.exe --restore` to restore the stock Windows taskbar without uninstalling).
+
+## Configuration
+
+Settings are stored in `%APPDATA%\gp-pc-boost\taskbar.ini` and can be toggled live from the taskbar's **Settings** gear button or right-click menu:
+- Taskbar Size (`Compact`, `Small`, `Standard`, `Large`)
+- Layout (`Win12 Split`, `Unified Top`, `Unified Bottom`) & Dock Edge (`Top`, `Bottom`)
+- Theme (`System`, `Dark`, `Light`) & Glass Style (`System`, `Frosted Glass`, `Solid`)
+- Auto-Hide Dock, Status Strip (`Hover Edge` / `Always On`), and **Gaming Mode** (`Fullscreen` / `Off`)
+- Tray icon density, hover previews, clock seconds, Search, Task View, CPU/RAM telemetry, Show Desktop strip
+
+## Build from Source
+
+Requires Rust (2024 edition) on Windows x64:
 
 ```powershell
-cd D:\Project\gp-pc-boost
-goose build bench\speed_bench.goose
-cargo test --offline
-cargo build --release --offline
+cargo test --lib
+cargo build --release --bin gp-taskbar
+# Optional full suite (requires local winrust-common workspace):
+cargo build --release
 ```
 
-## Desktop App UI
-
-Launch the native dark-mode Win32/GDI+ GUI (shows live lists for WinRust replacements, tiered bloatware, drives/caches, startup items, and mapped drives):
+## Desktop Boost UI & CLI
 
 ```powershell
-D:\Project\gp-pc-boost\target\release\gp-pc-boost-ui.exe
-# or:
-D:\Project\gp-pc-boost\target\release\gp-pc-boost.exe ui
-# or double-click:
-D:\Project\gp-pc-boost\Launch-UI.bat
+# Launch native dark-mode Win32 desktop UI:
+.\gp-pc-boost-ui.exe
+
+# Read-only CLI system inspection:
+.\gp-pc-boost.exe audit
+.\gp-pc-boost.exe report
+.\gp-pc-boost.exe disk clean-preview
+.\gp-pc-boost.exe tune preview
 ```
 
-## Quick Commands
+## License
 
-### Read-Only Inspection & Compatibility Report (No Admin Required)
-```powershell
-.\target\release\gp-pc-boost.exe audit
-.\target\release\gp-pc-boost.exe report
-.\target\release\gp-pc-boost.exe replace status
-.\target\release\gp-pc-boost.exe replace preview full
-.\target\release\gp-pc-boost.exe bloat preview
-.\target\release\gp-pc-boost.exe bench
-.\target\release\gp-pc-boost.exe disk clean-preview
-.\target\release\gp-pc-boost.exe tune preview
-```
-
-### 1-Click Self-Elevating Presets (`scripts\`)
-```powershell
-# Recommended: replaces taskmgr, settings, photoview, wiztree + debloat + power + mem purge (keeps Explorer, Search, WebView2, N:-Z:)
-powershell -ExecutionPolicy Bypass -File D:\Project\gp-pc-boost\scripts\apply-safe-all.ps1
-
-# Also replaces Taskbar (topbar) and Search (Alt+Space), keeps Explorer shell:
-powershell -ExecutionPolicy Bypass -File D:\Project\gp-pc-boost\scripts\apply-express.ps1
-
-# Full WinRust stack including rust-explorer shell (prompts for YES):
-powershell -ExecutionPolicy Bypass -File D:\Project\gp-pc-boost\scripts\apply-full-winrust.ps1
-
-# Full 1-click rollback (restores stock Explorer, Taskbar, Search, TaskMgr, services, power plan):
-powershell -ExecutionPolicy Bypass -File D:\Project\gp-pc-boost\scripts\rollback-all.ps1
-```
+Licensed under the [MIT License](LICENSE).
